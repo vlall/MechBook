@@ -1,11 +1,10 @@
 #!/usr/bin/python
 
 import mechanize
-import re
-import urllib, urllib2, cookielib
-from bs4 import BeautifulSoup
-import time
-
+import json
+import mechanize
+from utils import Load_FB
+ 
 class Identity:
 
 	def __init__(self, filename):
@@ -20,14 +19,14 @@ class Identity:
 				self.phoneBook.append(cells[2].rstrip())		
 		print '*** Reading CSV ****'
 
-	def open_File(self, number):
+	def open_File(self,browser, number):
 		self.number = number
 		sitetest = browser.open('https://www.facebook.com/search/str/%%20%s/keywords_top' % str(number))
 		site = sitetest.read()
 		return site
 
-	def site_Test(self, number = 8102934256):
-		username = self.open_File(number)
+	def site_Test(self,browser, number = 8102934256):
+		username = self.open_File(browser,number)
 		if '<div class="_5d-5">' in username:
 			nameSplit1 = username.split('<div class="_5d-5">')[1]
 			nameSplit2 = nameSplit1.split('<div class="_glm">')[0]
@@ -59,27 +58,21 @@ class Identity:
 			self.failedCounter +=1
 			return 'None'
 
-
 	def get_phoneBook(self):
 		print "Phone numbers found: %s" % (len(self.phoneBook))
 		return self.phoneBook
 
-if __name__ == '__main__':
-	browser = mechanize.Browser()
-	browser.set_handle_robots(False)
-	cookies = mechanize.CookieJar()
-	browser.addheaders = [('User-agent', 'Mozilla/5.0 (X11; U; Linux i686; en-US)     AppleWebKit/534.7 (KHTML, like Gecko) Chrome/7.0.517.41 Safari/534.7')]
-	browser.open("https://www.facebook.com/login.php")
-	browser.select_form(nr=0)
-	# Enter Facebook information of user that's performing the search
-	browser.form['email'] = email
-	browser.form['pass'] = password
-	response = browser.submit()
-	findUsers = Identity(datafile)
-	#print response.read()
+	def write_data(data, name='data_Out.csv'):
+		text_file = open(name, "w")
+		text_file.write(str(identityList))
+		text_file.close()
 
+if __name__ == '__main__':
 	#Site Test
-	print findUsers.site_Test(8102934256)
+	search = Load_FB()
+	findUsers = Identity(search._data)
+	print findUsers.site_Test(search.browser,8102934256)
+
 	identityList = []
 	for i in findUsers.phoneBook:
 		name = findUsers.get_Name(i)
@@ -94,7 +87,6 @@ if __name__ == '__main__':
 	
 	print identityList
 	print '%d unique identities found.\n %d numbers unidentitified.' % (len(identityList),findUsers.failedCounter)
-	text_file = open("data_Out.csv", "w")
-	text_file.write(str(identityList))
-	text_file.close()
+	write_data(identityList)
+
 	
