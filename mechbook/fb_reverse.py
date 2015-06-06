@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-import mechanize
 import json
 import mechanize
 from utils import Load_FB
