@@ -70,9 +70,11 @@ class Identity:
 if __name__ == '__main__':
 	#Site Test
 	search = Load_FB()
+	# Set delay in seconds between requests so Facebook doesnt get overloaded
+	delay = 1
 	findUsers = Identity(search._data)
 	print findUsers.site_Test(search.browser,8102934256)
-
+	'''
 	identityList = []
 	for i in findUsers.phoneBook:
 		name = findUsers.get_Name(i)
@@ -83,10 +85,9 @@ if __name__ == '__main__':
 				print '%s, %s' % (name,url)
 		else:
 			print 'Searching...'
-		time.sleep(1)
+		time.sleep(delay)
 	
 	print identityList
 	print '%d unique identities found.\n %d numbers unidentitified.' % (len(identityList),findUsers.failedCounter)
 	write_data(identityList)
-
-	
+	'''
