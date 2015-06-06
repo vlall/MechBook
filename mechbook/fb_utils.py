@@ -26,7 +26,12 @@ class Load_FB:
 		browser.form['pass'] = _pass
 		response = browser.submit()
 		self.browser = browser
+		self.response = response
+
+	def read_Response(self):
+		 return self.response.read()
 		
 if __name__ == '__main__': 
 	#Debugging
-	print response.read()
+	Load_FB()
+	print Load_FB().read_Response()
