@@ -19,5 +19,5 @@ class Load_FB:
 		#print response.read()
 
 	def data_up(self,datafile):
-		findUsers = Identity(datafile)
+		findUsers = Identity(config['datafile'])
 		return findUsers
