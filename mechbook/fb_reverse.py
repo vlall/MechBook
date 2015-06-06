@@ -2,12 +2,14 @@
 
 import json
 import mechanize
-from utils import Load_FB
- 
+from fb_utils import Load_FB
+import time
+
 class Identity:
 
-	def __init__(self, filename):
+	def __init__(self, browser, filename):
 		dataIn = open(filename, 'rU')
+		self.browser = browser
 		self.filename = filename
 		phoneBook = []
 		self.phoneBook = phoneBook
@@ -18,14 +20,15 @@ class Identity:
 				self.phoneBook.append(cells[2].rstrip())		
 		print '*** Reading CSV ****'
 
-	def open_File(self,browser, number):
+	def open_File(self, number):
+		browser = self.browser
 		self.number = number
 		sitetest = browser.open('https://www.facebook.com/search/str/%%20%s/keywords_top' % str(number))
 		site = sitetest.read()
 		return site
 
-	def site_Test(self,browser, number = 8102934256):
-		username = self.open_File(browser,number)
+	def site_Test(self, number = 8102934256):
+		username = self.open_File(number)
 		if '<div class="_5d-5">' in username:
 			nameSplit1 = username.split('<div class="_5d-5">')[1]
 			nameSplit2 = nameSplit1.split('<div class="_glm">')[0]
@@ -61,9 +64,9 @@ class Identity:
 		print "Phone numbers found: %s" % (len(self.phoneBook))
 		return self.phoneBook
 
-	def write_data(data, name='data_Out.csv'):
+	def write_data(self, data, name):
 		text_file = open(name, "w")
-		text_file.write(str(identityList))
+		text_file.write(str(data))
 		text_file.close()
 
 if __name__ == '__main__':
@@ -71,9 +74,9 @@ if __name__ == '__main__':
 	search = Load_FB()
 	# Set delay in seconds between requests so Facebook doesnt get overloaded
 	delay = 1
-	findUsers = Identity(search._data)
-	print findUsers.site_Test(search.browser,8102934256)
-	'''
+	findUsers = Identity(search.browser,search._data)
+	print findUsers.site_Test(8102934256)
+	
 	identityList = []
 	for i in findUsers.phoneBook:
 		name = findUsers.get_Name(i)
@@ -86,7 +89,7 @@ if __name__ == '__main__':
 			print 'Searching...'
 		time.sleep(delay)
 	
-	print identityList
-	print '%d unique identities found.\n %d numbers unidentitified.' % (len(identityList),findUsers.failedCounter)
-	write_data(identityList)
-	'''
+	print str(identityList)
+	print '%d unique identities found.\n%d numbers unidentitified.' % (len(identityList),findUsers.failedCounter)
+	findUsers.write_data(str(identityList), 'output.csv')
+	
