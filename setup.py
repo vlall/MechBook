@@ -12,10 +12,8 @@ if __name__ == "__main__":
     
     setup(
           install_requires = ['numpy>=1.7.1', # 1.7.0 contains a memory leak bug fixed in 1.7.1
-                              'scipy>=0.11.0',
                               #'scikits.sparse>=0.1', # required for sparse GPs only
-                              'matplotlib>=1.2.0',
-                              'h5py'],
+                              'mechanize>0.2.5'],
 
           cmdclass = {'build_ext': build_ext},
           ext_modules = [sparse_distance],
@@ -24,7 +22,6 @@ if __name__ == "__main__":
                       ['MechBook',
                        'MechBook.demos',
                        'MechBook.nodes',
-                       'bayespy.plot',
                        'MechBook.utils',
                        'MechBook.utils.tests',
 
