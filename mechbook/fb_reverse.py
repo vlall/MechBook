@@ -60,6 +60,25 @@ class Identity:
 			self.failedCounter +=1
 			return 'None'
 
+	def get_City(self, url):
+		browser = self.browser
+		sitetest = browser.open(url)
+		site = sitetest.read()
+		nameSplit1 = username.split('</i><div class="_42ef"><div><div class')                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+		nameSplit2 = nameSplit1.split('<div class="_6a _6b _5d-4">')[0]
+		city = nameSplit2.split('?ref=br_rs">')[0]
+		return city
+
+	def get_Job(self, url):
+		browser = self.browser
+		sitetest = browser.open(url)
+		site = sitetest.read()
+		nameSplit1 = username.split('<div class="_42ef"><div><div class="_50f3">')[1]
+		nameSplit2 = nameSplit1.split('<span class="_50f8">')[0]
+		city = nameSplit3.split('?ref=br_rs">')[0]
+		return city
+
+
 	def get_phoneBook(self):
 		print "Phone numbers found: %s" % (len(self.phoneBook))
 		return self.phoneBook
@@ -80,8 +99,9 @@ if __name__ == '__main__':
 	identityList = []
 	for i in findUsers.phoneBook:
 		name = findUsers.get_Name(i)
-		url = findUsers.get_URL(i)
 		if name != 'None':
+			url = findUsers.get_URL(i)
+			city = findUsers.get_City(url)
 			if [name,url] not in identityList:
 				identityList.append([name,url])
 				print '%s, %s' % (name,url)
