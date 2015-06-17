@@ -21,11 +21,16 @@ class Identity:
 				self.phoneBook.append(cells[2].rstrip())		
 		print '*** Reading CSV ****'
 
-	def open_File(self, number):
+	def mechRead(self,url):
 		browser = self.browser
-		self.number = number
-		sitetest = browser.open('https://www.facebook.com/search/str/%%20%s/keywords_top' % str(number))
+		sitetest = browser.open(url)
 		site = sitetest.read()
+		return site
+
+	def open_File(self, number):
+		self.number = number
+		url = 'https://www.facebook.com/search/str/%%20%s/keywords_top' % str(number)
+		site = self.mechRead(url)
 		return site
 
 	def site_Test(self, number = 8102934256):
@@ -62,10 +67,8 @@ class Identity:
 			return 'None'
 
 	def get_City(self, url):
-		city = ''
-		browser = self.browser
-		sitetest = browser.open(url)
-		site = sitetest.read()
+		city = 'None'
+		site = self.mechRead(url)
 		if 'hovercard="/ajax/hovercard/page.php?id=112222822122196">' in site:
 			nameSplit1 = site.split('hovercard="/ajax/hovercard/page.php?id=112222822122196">')[2]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
 			nameSplit2 = nameSplit1.split('</a></div>')[0]
@@ -74,44 +77,38 @@ class Identity:
 		return city
 
 	def get_Job(self, url):
-		browser = self.browser
-		sitetest = browser.open(url)
-		site = sitetest.read()
+		site = self.mechRead(url)
 		nameSplit1 = site.split('<div class="_42ef"><div><div class="_50f3">')[1]
 		nameSplit2 = nameSplit1.split('<span class="_50f8">')[0]
 		soup = BeautifulSoup(nameSplit2)
 		job = soup.getText()
-		return job
+		return job.encode("utf-8")
 
-	def get_intel(self, name, areaCode):
-		areaCode= areaCode.strip
-		name = name.split()
+	def get_intel(self, areaName):
 		firstName = name[0]
 		lastName = name[-1]
 		# if there's a middle name, these are usually made up by facebook users
 		if len(name) == 3:
 			middleName = name[1]
-		url = 'http://www.intelius.com/results.php?ReportType=1&formname=name&qf=%s&qmi=&qn=%s&qcs=%s&focusfirst=1' % (firstName, lastName, areaCode)
+		url = 'http://www.intelius.com/results.php?ReportType=1&formname=name&qf=%s&qmi=&qn=%s&qcs=%s&focusfirst=1' % (firstName, lastName, areaName)
 		#TO DO: Parse the intelius link. For now this is not neccessary. 
 		browser = self.browser
 		sitetest = browser.open(url)
 		site = sitetest.read()
-		nameSplit1 = site.split('We found')[1]
-		nameSplit2 = nameSplit1.split('</p>')[0]
-		soup = BeautifulSoup(nameSplit2)
-		intel = soup.getText()
-		return url
+		#nameSplit1 = site.split('We found')[1]
+		#nameSplit2 = nameSplit1.split('</p>')[0]
+		#soup = BeautifulSoup(nameSplit2)
+		#intel = soup.getText()
+		return url.encode("utf-8")
 
 	def get_areaCode(self, number):
 		url = 'http://www.allareacodes.com/' + str(number)
-		browser = self.browser
-		sitetest = browser.open(url)
-		site = sitetest.read()
+		site = self.mechRead(url)
 		nameSplit1 = site.split('<td>Major City:</td>')[1]
 		nameSplit2 = nameSplit1.split('</td>')[0]
 		soup = BeautifulSoup(nameSplit2)
 		area = soup.getText()
-		return area
+		return area.encode("utf-8")
 
 	def get_phoneBook(self):
 		print "Phone numbers found: %s" % (len(self.phoneBook))
@@ -138,14 +135,15 @@ if __name__ == '__main__':
 			url = findUsers.get_URL(i)
 			city = findUsers.get_City(url)
 			job = findUsers.get_Job(url)
-			areaCode = findUsers.get_areaCode(phone)
-			intel = findUsers.get_intel(name,areaCode)
+			areaName = findUsers.get_areaCode(phone)
+			intel = findUsers.get_intel(areaName)
 			if [name,url] not in identityList:
-				identityList.append([name,url,city,job,areaCode,intel])
-				print '%s, %s, %s, %s, %s, %s, %s' % (phone,name,url,city,job,areaCode,intel)
+				identityList.append([name,url,city,job,areaName,intel])
+				print '%s, %s, %s, %s, %s, %s, %s' % (phone,name,url,city,job,areaName,intel)
 		else:
 			print 'Searching...'
 		time.sleep(delay)
+	
 	print str(identityList)
 	print '%d unique identities found.\n%d numbers unidentitified.' % (len(identityList),findUsers.failedCounter)
 	findUsers.write_data(str(identityList), 'output.csv')
