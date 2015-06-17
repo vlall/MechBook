@@ -73,7 +73,6 @@ class Identity:
 			city = soup.getText()
 		return city
 
-
 	def get_Job(self, url):
 		browser = self.browser
 		sitetest = browser.open(url)
@@ -85,6 +84,7 @@ class Identity:
 		return job
 
 	def get_intel(self, name, areaCode):
+		areaCode= areaCode.strip
 		name = name.split()
 		firstName = name[0]
 		lastName = name[-1]
@@ -92,15 +92,15 @@ class Identity:
 		if len(name) == 3:
 			middleName = name[1]
 		url = 'http://www.intelius.com/results.php?ReportType=1&formname=name&qf=%s&qmi=&qn=%s&qcs=%s&focusfirst=1' % (firstName, lastName, areaCode)
-		#TO DO: Make intelius
+		#TO DO: Parse the intelius link. For now this is not neccessary. 
 		browser = self.browser
 		sitetest = browser.open(url)
 		site = sitetest.read()
-		nameSplit1 = site.split('We found')[0]
+		nameSplit1 = site.split('We found')[1]
 		nameSplit2 = nameSplit1.split('</p>')[0]
 		soup = BeautifulSoup(nameSplit2)
 		intel = soup.getText()
-		return [intel, url]
+		return url
 
 	def get_areaCode(self, number):
 		url = 'http://www.allareacodes.com/' + str(number)
@@ -146,7 +146,6 @@ if __name__ == '__main__':
 		else:
 			print 'Searching...'
 		time.sleep(delay)
-	
 	print str(identityList)
 	print '%d unique identities found.\n%d numbers unidentitified.' % (len(identityList),findUsers.failedCounter)
 	findUsers.write_data(str(identityList), 'output.csv')
