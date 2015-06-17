@@ -4,6 +4,7 @@ import json
 import mechanize
 from fb_utils import Load_FB
 import time
+from bs4 import BeautifulSoup
 
 class Identity:
 
@@ -61,23 +62,56 @@ class Identity:
 			return 'None'
 
 	def get_City(self, url):
+		city = ''
 		browser = self.browser
 		sitetest = browser.open(url)
 		site = sitetest.read()
-		nameSplit1 = username.split('</i><div class="_42ef"><div><div class')                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
-		nameSplit2 = nameSplit1.split('<div class="_6a _6b _5d-4">')[0]
-		city = nameSplit2.split('?ref=br_rs">')[0]
+		if 'hovercard="/ajax/hovercard/page.php?id=112222822122196">' in site:
+			nameSplit1 = site.split('hovercard="/ajax/hovercard/page.php?id=112222822122196">')[2]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+			nameSplit2 = nameSplit1.split('</a></div>')[0]
+			soup = BeautifulSoup(nameSplit2)
+			city = soup.getText()
 		return city
+
 
 	def get_Job(self, url):
 		browser = self.browser
 		sitetest = browser.open(url)
 		site = sitetest.read()
-		nameSplit1 = username.split('<div class="_42ef"><div><div class="_50f3">')[1]
+		nameSplit1 = site.split('<div class="_42ef"><div><div class="_50f3">')[1]
 		nameSplit2 = nameSplit1.split('<span class="_50f8">')[0]
-		city = nameSplit3.split('?ref=br_rs">')[0]
-		return city
+		soup = BeautifulSoup(nameSplit2)
+		job = soup.getText()
+		return job
 
+	def get_intel(self, name, areaCode):
+		name = name.split()
+		firstName = name[0]
+		lastName = name[-1]
+		# if there's a middle name, these are usually made up by facebook users
+		if len(name) == 3:
+			middleName = name[1]
+		url = 'http://www.intelius.com/results.php?ReportType=1&formname=name&qf=%s&qmi=&qn=%s&qcs=%s&focusfirst=1' % (firstName, lastName, areaCode)
+		#TO DO: Make intelius
+		browser = self.browser
+		sitetest = browser.open(url)
+		site = sitetest.read()
+		nameSplit1 = site.split('We found')[0]
+		nameSplit2 = nameSplit1.split('</p>')[0]
+		soup = BeautifulSoup(nameSplit2)
+		intel = soup.getText()
+		return [intel, url]
+
+	def get_areaCode(self, number):
+		url = 'http://www.allareacodes.com/' + str(number)
+		browser = self.browser
+		sitetest = browser.open(url)
+		site = sitetest.read()
+		nameSplit1 = site.split('<td>Major City:</td>')[1]
+		nameSplit2 = nameSplit1.split('</td>')[0]
+		soup = BeautifulSoup(nameSplit2)
+		area = soup.getText()
+		return area
 
 	def get_phoneBook(self):
 		print "Phone numbers found: %s" % (len(self.phoneBook))
@@ -94,17 +128,21 @@ if __name__ == '__main__':
 	# Set delay in seconds between requests so Facebook doesnt get overloaded
 	delay = 1
 	findUsers = Identity(search.browser,search._data)
-	print findUsers.site_Test(8102934256)
-	
+	print findUsers.site_Test()
 	identityList = []
+
 	for i in findUsers.phoneBook:
 		name = findUsers.get_Name(i)
 		if name != 'None':
+			phone = i
 			url = findUsers.get_URL(i)
 			city = findUsers.get_City(url)
+			job = findUsers.get_Job(url)
+			areaCode = findUsers.get_areaCode(phone)
+			intel = findUsers.get_intel(name,areaCode)
 			if [name,url] not in identityList:
-				identityList.append([name,url])
-				print '%s, %s' % (name,url)
+				identityList.append([name,url,city,job,areaCode,intel])
+				print '%s, %s, %s, %s, %s, %s, %s' % (phone,name,url,city,job,areaCode,intel)
 		else:
 			print 'Searching...'
 		time.sleep(delay)
