@@ -10,10 +10,14 @@ class Load_FB:
 		_email = config['email']
 		_pass = config['pass']
 		# Set Location of data file
-		_data = '../' + config['datafile']
+		_input = '../' + config['input_file']
+		_output = config['output_file']
+		_api = config['gmaps-api-key']
 		self._email = _email
 		self._pass = _pass
-		self._data = _data
+		self._input = _input
+		self._output = _output
+		self._api = _api 
  		browser = mechanize.Browser()
 		browser.set_handle_robots(False)
 		cookies = mechanize.CookieJar()
