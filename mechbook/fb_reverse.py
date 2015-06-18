@@ -5,6 +5,8 @@ import mechanize
 from fb_utils import Load_FB
 import time
 from bs4 import BeautifulSoup
+import urllib2
+import csv
 
 class Identity:
 
@@ -35,46 +37,49 @@ class Identity:
 
 	def site_Test(self, number = 8102934256):
 		username = self.open_File(number)
-		if '<div class="_5d-5">' in username:
+		try:
 			nameSplit1 = username.split('<div class="_5d-5">')[1]
 			nameSplit2 = nameSplit1.split('<div class="_glm">')[0]
 			fullName = nameSplit2.split('</div>')[0]
 			return 'Successfully connected, reverse search works'
-		else:
+		except Exception:
 			return 'FAILED'
 
 	def get_Name(self, number):
 		username = self.open_File(number)
 		# Scrape between '<div class="_5d-5">' and '<div class="_glm">' for facebook profile name
-		if '<div class="_5d-5">' in username:
+		try:
 			nameSplit1 = username.split('<div class="_5d-5">')[1]
 			nameSplit2 = nameSplit1.split('<div class="_glm">')[0]
 			fullName = nameSplit2.split('</div>')[0]
 			return fullName
-		else:
+		except Exception:
 			return 'None'
 
 	def get_URL(self, number):
 		username = self.open_File(number)
 		# Scrape between '<div class="_5d-5">' and '<div class="_glm">' for facebook profile name
-		if '<div class="_5d-5">' in username:
+		try:
 			nameSplit1 = username.split('<div class="_gll"><a href="')[1]
 			nameSplit2 = nameSplit1.split('<div class="_6a _6b _5d-4">')[0]
 			fullURL = nameSplit2.split('?ref=br_rs">')[0]
 			return fullURL
-		else:
+		except Exception:
 			self.failedCounter +=1
 			return 'None'
 
 	def get_City(self, url):
-		city = 'None'
+
 		site = self.mechRead(url)
-		if 'hovercard="/ajax/hovercard/page.php?id=112222822122196">' in site:
+		try:
 			nameSplit1 = site.split('hovercard="/ajax/hovercard/page.php?id=112222822122196">')[2]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
 			nameSplit2 = nameSplit1.split('</a></div>')[0]
 			soup = BeautifulSoup(nameSplit2)
 			city = soup.getText()
-		return city
+			city = city.replace(',','')
+			return city
+		except Exception:
+			return 'None'
 
 	def get_Job(self, url):
 		site = self.mechRead(url)
@@ -84,7 +89,22 @@ class Identity:
 		job = soup.getText()
 		return job.encode("utf-8")
 
-	def get_intel(self, areaName):
+# This function sometimes limits calls. Delete if neccessary.
+	'''
+	def get_carrier(self, number):
+		url = 'https://www.whitepages.com/phone/%s' % str(number)
+		site = self.mechRead(url)
+		try:
+			nameSplit1 = site.split('Carrier:</span><span>')[1]
+			nameSplit2 = nameSplit1.split('</span>')[0]
+			soup = BeautifulSoup(nameSplit2)
+			carrier = soup.getText()
+			return carrier.encode("utf-8")
+		except Exception:
+			return None
+	'''
+	def get_intel(self, name, areaName):
+		name = name.split()
 		firstName = name[0]
 		lastName = name[-1]
 		# if there's a middle name, these are usually made up by facebook users
@@ -92,39 +112,86 @@ class Identity:
 			middleName = name[1]
 		url = 'http://www.intelius.com/results.php?ReportType=1&formname=name&qf=%s&qmi=&qn=%s&qcs=%s&focusfirst=1' % (firstName, lastName, areaName)
 		#TO DO: Parse the intelius link. For now this is not neccessary. 
-		browser = self.browser
-		sitetest = browser.open(url)
-		site = sitetest.read()
-		#nameSplit1 = site.split('We found')[1]
-		#nameSplit2 = nameSplit1.split('</p>')[0]
-		#soup = BeautifulSoup(nameSplit2)
-		#intel = soup.getText()
+		try:
+			browser = self.browser
+			sitetest = browser.open(url)
+			site = sitetest.read()
+		except Exception:
+			print "%s : intellius error" % name 
 		return url.encode("utf-8")
 
 	def get_areaCode(self, number):
-		url = 'http://www.allareacodes.com/' + str(number)
-		site = self.mechRead(url)
-		nameSplit1 = site.split('<td>Major City:</td>')[1]
-		nameSplit2 = nameSplit1.split('</td>')[0]
-		soup = BeautifulSoup(nameSplit2)
-		area = soup.getText()
-		return area.encode("utf-8")
+		try:
+			url = 'http://www.allareacodes.com/' + str(number)
+			site = self.mechRead(url)
+			nameSplit1 = site.split('<td>Major City:</td>')[1]
+			nameSplit2 = nameSplit1.split('</td>')[0]
+			soup = BeautifulSoup(nameSplit2)
+			area = soup.getText()
+			return area.encode("utf-8")
+		except Exception:
+			return 'None'
+
+	def get_GPS(self, areaCode, key):
+		areaCode = areaCode.replace(' ', '')
+		if areaCode != 'None':
+			#try:
+			url ='https://maps.googleapis.com/maps/api/geocode/json?address=%s&sensor=false&key=%s' % (str(areaCode), key)
+			response = urllib2.urlopen(url)
+			geoCode = json.load(response)
+			#latitude = geoCode['results']['geometry']['bounds']['northeast']['lat'] 
+			#longitude = geoCode['results']['geometry']['bounds']['northeast']['lng'] 
+			#pprint(geoCode)
+			lat = geoCode['results'][0]['geometry']['bounds']['northeast']['lat']
+			lng = geoCode['results'][0]['geometry']['bounds']['northeast']['lng']
+			return lat,lng
+		#except Exception:
+		#	return areaCode
+		#return 'None'
 
 	def get_phoneBook(self):
 		print "Phone numbers found: %s" % (len(self.phoneBook))
 		return self.phoneBook
-
+	'''
 	def write_data(self, data, name):
 		text_file = open(name, "w")
-		text_file.write(str(data))
-		text_file.close()
+		for user in data:
+			user = (", ".join(user))
+			text_file.write(str(user))
+			text_file.write(str('\n'))
+			text_file.close()
+
+	
+	def edit_Gmap(self, dataArray):
+		filename = 'index.html'
+		dataIn = open(filename, 'rU')
+ 		dataInject = dataIn.split('Geo-cordinations')[0]
+		try:
+			for i in dataArray:
+				dataInject += i
+		except:
+			print GMaps error
+			return None
+	'''
+
+	def write_data(self, data, filename):
+		with open(filename, "wb") as f:
+		    writer = csv.writer(f)
+		    writer.writerows(data)
+	'''
+	def make_JSON(self, data, name='Example.json'):
+		text_file = open(name, "w")
+		x = json.dumps(data)
+		text_file.write(x)
+		return "Success"
+	'''
 
 if __name__ == '__main__':
 	#Site Test
 	search = Load_FB()
 	# Set delay in seconds between requests so Facebook doesnt get overloaded
 	delay = 1
-	findUsers = Identity(search.browser,search._data)
+	findUsers = Identity(search.browser,search._input)
 	print findUsers.site_Test()
 	identityList = []
 
@@ -136,15 +203,17 @@ if __name__ == '__main__':
 			city = findUsers.get_City(url)
 			job = findUsers.get_Job(url)
 			areaName = findUsers.get_areaCode(phone)
-			intel = findUsers.get_intel(areaName)
+			intel = findUsers.get_intel(name, areaName)
+			location = findUsers.get_GPS(areaName, search._api)
+			#carrier = findUsers.get_carrier(phone)
 			if [name,url] not in identityList:
-				identityList.append([name,url,city,job,areaName,intel])
-				print '%s, %s, %s, %s, %s, %s, %s' % (phone,name,url,city,job,areaName,intel)
+				identityList.append([name,url,city,job,areaName,intel,location])
+				print '%s, %s, %s, %s, %s, %s, %s, %s' % (phone,name,url,city,job,areaName,intel,location)
 		else:
 			print 'Searching...'
 		time.sleep(delay)
 	
 	print str(identityList)
 	print '%d unique identities found.\n%d numbers unidentitified.' % (len(identityList),findUsers.failedCounter)
-	findUsers.write_data(str(identityList), 'output.csv')
-	
+	findUsers.write_data(identityList, search._output)
+	#findUsers.make_JSON(identityList)
