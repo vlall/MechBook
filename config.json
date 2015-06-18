@@ -1,5 +1,8 @@
 {
 "Email" : "YOUR_Email",
 "Password" : "YOUR_Password",
-"Datafile" : "example.csv"
+"Datafile" : "example.csv",
+"input_file" : "input.csv",
+"output_file" : "output.csv",
+"gmaps-api-key": "XXXXXXXXXXXXXXXXXXXXXX"
 }
