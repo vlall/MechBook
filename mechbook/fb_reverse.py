@@ -2,34 +2,52 @@
 
 import json
 import mechanize
-from fb_utils import Load_FB
-import time
+from militia.tools.facebook import Load_FB
+from militia.tools.genderize import Find_Gender
 from bs4 import BeautifulSoup
 import urllib2
-import csv
+import time
+
 
 class Identity:
 
 	def __init__(self, browser, filename):
+
 		dataIn = open(filename, 'rU')
 		self.browser = browser
 		self.filename = filename
 		phoneBook = []
+		idBook = []
+		metaDict = {}
 		self.phoneBook = phoneBook
+		self.idBook = idBook
 		self.failedCounter = 0
+		self.counter = 0
 		for row in dataIn:
 			cells = row.split(',')
 			if 'phone' in row:
-				self.phoneBook.append(cells[2].rstrip())		
+				phoneBook.append(cells[2].rstrip())
+				self.indice = cells[0].rstrip()
+				idBook.append(self.indice)
+			'''
+			if indice in row:
+				metaKey = cells[1].rstrip()
+				metaValue = cells[2].rstrip()
+				metaDict[metaKey] = metaValue
+				self.metaDict = metaDict
+			'''
+
 		print '*** Reading CSV ****'
 
 	def mechRead(self,url):
+
 		browser = self.browser
 		sitetest = browser.open(url)
 		site = sitetest.read()
 		return site
 
 	def open_File(self, number):
+
 		self.number = number
 		url = 'https://www.facebook.com/search/str/%%20%s/keywords_top' % str(number)
 		site = self.mechRead(url)
@@ -43,11 +61,11 @@ class Identity:
 			fullName = nameSplit2.split('</div>')[0]
 			return 'Successfully connected, reverse search works'
 		except Exception:
-			return 'FAILED'
+			return 'Failed to Connect. Either check your request limit for the past 24 hours or facebook HTML has been updated'
 
 	def get_Name(self, number):
+
 		username = self.open_File(number)
-		# Scrape between '<div class="_5d-5">' and '<div class="_glm">' for facebook profile name
 		try:
 			nameSplit1 = username.split('<div class="_5d-5">')[1]
 			nameSplit2 = nameSplit1.split('<div class="_glm">')[0]
@@ -57,15 +75,14 @@ class Identity:
 			return 'None'
 
 	def get_URL(self, number):
+
 		username = self.open_File(number)
-		# Scrape between '<div class="_5d-5">' and '<div class="_glm">' for facebook profile name
 		try:
 			nameSplit1 = username.split('<div class="_gll"><a href="')[1]
 			nameSplit2 = nameSplit1.split('<div class="_6a _6b _5d-4">')[0]
 			fullURL = nameSplit2.split('?ref=br_rs">')[0]
 			return fullURL
 		except Exception:
-			self.failedCounter +=1
 			return 'None'
 
 	def get_City(self, url):
@@ -82,28 +99,19 @@ class Identity:
 			return 'None'
 
 	def get_Job(self, url):
-		site = self.mechRead(url)
-		nameSplit1 = site.split('<div class="_42ef"><div><div class="_50f3">')[1]
-		nameSplit2 = nameSplit1.split('<span class="_50f8">')[0]
-		soup = BeautifulSoup(nameSplit2)
-		job = soup.getText()
-		return job.encode("utf-8")
 
-# This function sometimes limits calls. Delete if neccessary.
-	'''
-	def get_carrier(self, number):
-		url = 'https://www.whitepages.com/phone/%s' % str(number)
 		site = self.mechRead(url)
 		try:
-			nameSplit1 = site.split('Carrier:</span><span>')[1]
-			nameSplit2 = nameSplit1.split('</span>')[0]
+			nameSplit1 = site.split('<div class="_42ef"><div><div class="_50f3">')[1]
+			nameSplit2 = nameSplit1.split('<span class="_50f8">')[0]
 			soup = BeautifulSoup(nameSplit2)
-			carrier = soup.getText()
-			return carrier.encode("utf-8")
+			job = soup.getText()
+			return job.encode("utf-8")
 		except Exception:
-			return None
-	'''
-	def get_intel(self, name, areaName):
+			return 'None'
+
+	def get_Intel(self, name, areaName):
+
 		name = name.split()
 		firstName = name[0]
 		lastName = name[-1]
@@ -118,9 +126,10 @@ class Identity:
 			site = sitetest.read()
 		except Exception:
 			print "%s : intellius error" % name 
-		return url.encode("utf-8")
+		return str(url)
 
 	def get_areaCode(self, number):
+
 		try:
 			url = 'http://www.allareacodes.com/' + str(number)
 			site = self.mechRead(url)
@@ -133,6 +142,7 @@ class Identity:
 			return 'None'
 
 	def get_GPS(self, areaCode, key):
+
 		areaCode = areaCode.replace(' ', '')
 		if areaCode != 'None':
 			#try:
@@ -142,78 +152,106 @@ class Identity:
 			#latitude = geoCode['results']['geometry']['bounds']['northeast']['lat'] 
 			#longitude = geoCode['results']['geometry']['bounds']['northeast']['lng'] 
 			#pprint(geoCode)
-			lat = geoCode['results'][0]['geometry']['bounds']['northeast']['lat']
-			lng = geoCode['results'][0]['geometry']['bounds']['northeast']['lng']
+			lat = geoCode['results'][0]['geometry']['location']['lat']
+			lng = geoCode['results'][0]['geometry']['location']['lng']
 			return lat,lng
-		#except Exception:
-		#	return areaCode
-		#return 'None'
+
 
 	def get_phoneBook(self):
 		print "Phone numbers found: %s" % (len(self.phoneBook))
 		return self.phoneBook
-	'''
-	def write_data(self, data, name):
-		text_file = open(name, "w")
-		for user in data:
-			user = (", ".join(user))
-			text_file.write(str(user))
-			text_file.write(str('\n'))
-			text_file.close()
 
-	
-	def edit_Gmap(self, dataArray):
-		filename = 'index.html'
-		dataIn = open(filename, 'rU')
- 		dataInject = dataIn.split('Geo-cordinations')[0]
-		try:
-			for i in dataArray:
-				dataInject += i
-		except:
-			print GMaps error
-			return None
-	'''
+	def edit_Gmap(self, gpsArray):
+
+		jsArray = []
+		for gps in gpsArray:
+			if gps != None:
+				gps = 'new google.maps.LatLng'+ str(gps)
+				jsArray.append(gps)
+		jsArray = str(jsArray)
+		jsArray = jsArray.replace("'", "")
+		jsArray = jsArray.replace("[", "")
+		jsArray = jsArray.replace("]", "")
+		text_file = open("data/gps.txt", "w")
+		text_file.write(jsArray)
+		text_file.close()
+	def write_text(self, data, filename='log.txt'):
+		pass
 
 	def write_data(self, data, filename):
-		with open(filename, "wb") as f:
-		    writer = csv.writer(f)
-		    writer.writerows(data)
-	'''
-	def make_JSON(self, data, name='Example.json'):
-		text_file = open(name, "w")
-		x = json.dumps(data)
-		text_file.write(x)
-		return "Success"
-	'''
+	    with open(filename,'w') as f:
+		    for x in data:
+		        for y in x:
+					y = str(y)
+					f.write(y + ',')
+		        f.write('\n')
+
+	def genderCheck(self,name):
+
+		name = name.split()
+		x = Find_Gender(name[0])
+		return str(x.gender)
+	
+	def get_MetaTags(self, index, tag):
+		tag = '%s,%s' %(str(index), str(tag))
+		dataIn = open(self.filename, 'rU')
+		for row in dataIn:
+			cells = row.split(',')
+			if tag in row:
+				return str(cells[2].rstrip())
+		else:
+			return 'None'
+	def get_Meta(self, index):
+		self.meta = {}
+		meta = self.meta 
+		tags = ['weight', 'height', 'ethnicity', 'cup', 'age', 'username', 'name', 'eyes', 'waist', 'hair', 'twitter', 'piercings', 'tattoos', 'build', 'email', 'bust', 'hairtype', 'reviews', 'rating', 'languages', 'idverification']
+		for i in tags:
+			self.add = self.get_MetaTags(index,i)
+			meta[str(i)] = self.add
+
+		return meta
 
 if __name__ == '__main__':
 	#Site Test
 	search = Load_FB()
 	# Set delay in seconds between requests so Facebook doesnt get overloaded
-	delay = 1
+	delay = .5
 	findUsers = Identity(search.browser,search._input)
 	print findUsers.site_Test()
 	identityList = []
-
-	for i in findUsers.phoneBook:
-		name = findUsers.get_Name(i)
+	gpsArray = []
+	for n, phone in enumerate(findUsers.phoneBook):
+		name = findUsers.get_Name(phone)
 		if name != 'None':
-			phone = i
-			url = findUsers.get_URL(i)
+			findUsers.counter+=1
+			index = findUsers.idBook[n]
+			url = findUsers.get_URL(phone)
 			city = findUsers.get_City(url)
 			job = findUsers.get_Job(url)
 			areaName = findUsers.get_areaCode(phone)
-			intel = findUsers.get_intel(name, areaName)
+			intel = findUsers.get_Intel(name, areaName)
 			location = findUsers.get_GPS(areaName, search._api)
-			#carrier = findUsers.get_carrier(phone)
-			if [name,url] not in identityList:
-				identityList.append([name,url,city,job,areaName,intel,location])
-				print '%s, %s, %s, %s, %s, %s, %s, %s' % (phone,name,url,city,job,areaName,intel,location)
+			gender = findUsers.genderCheck(name)
+			meta = findUsers.get_Meta(index)
+			#meta = findUsers.metaDict
+			appendOut = [index,phone,name, gender,url,city,job,areaName,intel,location,meta]
+			if appendOut not in identityList:
+				gpsArray.append(location)
+				identityList.append(appendOut)
 		else:
-			print 'Searching...'
+			findUsers.counter+=1
+			findUsers.failedCounter +=1
+			print 'Searching... %s'% str(findUsers.counter)
 		time.sleep(delay)
+		findUsers.write_data(identityList, search._output)
+		findUsers.edit_Gmap(gpsArray)
 	
 	print str(identityList)
-	print '%d unique identities found.\n%d numbers unidentitified.' % (len(identityList),findUsers.failedCounter)
-	findUsers.write_data(identityList, search._output)
-	#findUsers.make_JSON(identityList)
+	lenList= len(identityList)
+	print '%d profiles found.\n%d numbers unidentitified.\n%d numbers tested total.' % (len(identityList),findUsers.failedCounter, len(identityList)+findUsers.failedCounter)
+	percent = float(lenList)
+	percent = (percent) / (percent + float(findUsers.failedCounter))
+	print '%f percent return rate on mobile numbers' % float(percent * 100.0)
+	#findUsers.write_data(identityList), search._output)
+	#findUsers.edit_Gmap(gpsArray)
+	
