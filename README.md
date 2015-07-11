@@ -2,13 +2,10 @@
 
 Mechanize Facebook Reverse Search Along with other identity exposers.
 
-Used without Facebook API.
+Given a csv list containing phone numbers, reverse search facebook profile names and links of poster
 
-Given a csv list containing phone numbers off escort sites, reverse search facebook profile names and links of poster
+Known Facebook HTML updates
 
-####Future implementations:
-Google Maps API heat map, and actual locations
-White Pages lookup for phone carrier
-Peoplefinder for address
-Machine learning algorithm to know if name is fake or real
-
+Date  | Status
+------------- | -------------
+July 7, 2015  | Fixed
