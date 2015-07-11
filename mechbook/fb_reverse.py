@@ -7,7 +7,7 @@ from militia.tools.genderize import Find_Gender
 from bs4 import BeautifulSoup
 import urllib2
 import time
-
+import sys
 
 class Identity:
 
@@ -59,9 +59,12 @@ class Identity:
 			nameSplit1 = username.split('<div class="_5d-5">')[1]
 			nameSplit2 = nameSplit1.split('<div class="_glm">')[0]
 			fullName = nameSplit2.split('</div>')[0]
-			return 'Successfully connected, reverse search works'
+			print 'Successfully connected, reverse search works'
+			return True
 		except Exception:
-			return 'Failed to Connect. Either check your request limit for the past 24 hours or facebook HTML has been updated'
+			print 'Failed to Connect. One of two things has happened:\n1) Either check your request limit for the past 24 hours \n2) Facebook source code has been updated, this is an easy fix.'
+			return False
+
 
 	def get_Name(self, number):
 
@@ -217,7 +220,10 @@ if __name__ == '__main__':
 	# Set delay in seconds between requests so Facebook doesnt get overloaded
 	delay = .5
 	findUsers = Identity(search.browser,search._input)
-	print findUsers.site_Test()
+	if findUsers.site_Test()!=True:
+		raise SystemExit
+
+
 	identityList = []
 	gpsArray = []
 	for n, phone in enumerate(findUsers.phoneBook):
