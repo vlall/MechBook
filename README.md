@@ -4,6 +4,6 @@ Mechanize Facebook Reverse Search Along with other identity exposers. Given a cs
 
 Known Facebook HTML updates
 
-Date  | Status
+Date  | Status  | Description
 ------------- | -------------
-July 7, 2015  | Fixed
+July 7, 2015  | Broken | Mechanize label error logging in, fix should be easy 
