@@ -5,5 +5,6 @@ Mechanize Facebook Reverse Search Along with other identity exposers. Given a cs
 Known Facebook HTML updates
 
 Date  | Status  | Description
-------------- | -------------
-July 7, 2015  | Broken | Mechanize label error logging in, fix should be easy 
+------------- | -------------|--------------
+July 21, 2015  | Fixed | "Cookies are not enabled on your browser. Please enable cookies in your browser preferences to continue."
+
