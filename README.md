@@ -6,5 +6,5 @@ Known Facebook HTML updates
 
 Date  | Status  | Description
 ------------- | -------------|--------------
-July 21, 2015  | Fixed | "Cookies are not enabled on your browser. Please enable cookies in your browser preferences to continue."
+July 21, 2015  | Fixed | Make sure cookies are enabled, or you will run into this html error during login. "Cookies are not enabled on your browser. Please enable cookies in your browser preferences to continue."
 
