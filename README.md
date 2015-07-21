@@ -6,5 +6,5 @@ Known Facebook HTML updates
 
 Date        | Status         | Description
 ------------- | -------------|--------------
-July 21, 2015  | Fixed | Make sure cookies are enabled! Or you get: <b>"Cookies are not enabled on your browser. Please enable cookies in your browser preferences to continue."<b>
+July 9, 2015  | Broken | <b>"Cookies are not enabled on your browser. Please enable cookies in your browser preferences to continue."<b>
 
