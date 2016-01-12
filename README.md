@@ -37,9 +37,9 @@ Mechbook allows you to Mechanize Facebook Reverse Search- Given a csv list conta
 	print myPage
 	
 	# Save to out.txt
-		fileOut = open("out.txt", "w")
-		fileOut.write(myPage)	
-	  fileOut.close
+	fileOut = open("out.txt", "w")
+	fileOut.write(myPage)	
+  	fileOut.close
 	  
 	# Use Apache Tika to analyze out.txt
   	parsed = parser.from_file('out.txt')
