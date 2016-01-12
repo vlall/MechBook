@@ -2,6 +2,7 @@ import mechanize
 import re
 import time
 
+# BROKEN
 class Run_Tests:
 
 	def __init__(self, filename):
@@ -25,3 +26,8 @@ class Run_Tests:
 			return 'Successfully connected, reverse search works'
 		else:
 			return 'FAILED'
+
+if __name__ == '__main__': 
+	#Debugging
+	print Load_FB('input.csv').site_Test()
+
