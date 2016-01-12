@@ -10,12 +10,11 @@ VERSION      = '0.1'
 if __name__ == "__main__":
 
     import os
+    from setuptools import setup, find_packages
 
     def read(fname):
         return open(os.path.join(os.path.dirname(__file__), fname)).read()
-
-    from setuptools import setup, find_packages
-    
+   
     setup(
           install_requires = ['numpy>=1.8.0', # 1.8 implements broadcasting in numpy.linalg
                               'mechanize>=0.2.5',
@@ -32,7 +31,6 @@ if __name__ == "__main__":
           keywords         =
             [
               'mechanize facebook',
-
             ],
           classifiers =
             [ 
@@ -40,3 +38,4 @@ if __name__ == "__main__":
               'Topic :: Scientific/Engineering :: Information Analysis'
             ]
           )
+
