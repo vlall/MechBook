@@ -1,5 +1,5 @@
 # MechBook
-Mechbook allows you to Mechanize Facebook Reverse Search- Given a csv list containing phone numbers, reverse search facebook profile names and links of posters.
+Mechbook allows you to Mechanize Facebook reverse searches- given a csv list containing phone numbers, reverse search facebook profile names and links of posters.
 #####TO DO
 - Clean up Testing Folder
 - Fix Dependencies for Fb_reverse.py
@@ -28,21 +28,21 @@ Mechbook allows you to Mechanize Facebook Reverse Search- Given a csv list conta
   
 4. At this point, scraping should be easy! Here's an example.  
   ```
-  import tika
-  from tika import parser
-  from fb_utils import Load_FB()
-  
-  # Mechanize into Your Facebook Profile
-	myPage = Load_FB().read_Response()
-	print myPage
-	
-	# Save to out.txt
-	fileOut = open("out.txt", "w")
-	fileOut.write(myPage)	
-  	fileOut.close
-	  
-	# Use Apache Tika to analyze out.txt
-  	parsed = parser.from_file('out.txt')
-	print parsed["content"]
-	print parsed["metadata"]
+import tika
+from tika import parser
+from fb_utils import Load_FB()
+
+# Mechanize into Your Facebook Profile
+myPage = Load_FB().read_Response()
+print myPage
+
+# Save to out.txt
+fileOut = open("out.txt", "w")
+fileOut.write(myPage)	
+fileOut.close
+
+# Use Apache Tika to analyze out.txt
+parsed = parser.from_file('out.txt')
+print parsed["content"]
+print parsed["metadata"]
 	```
