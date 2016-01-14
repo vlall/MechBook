@@ -32,7 +32,7 @@ import tika
 from tika import parser
 from fb_utils import Load_FB
 
-# Mechanize into Your Facebook Profile
+# Use mobile Facebook site due to caching issues
 test = Load_FB()
 url ='https://m.facebook.com/search/top/?q=%s' % TESTING_NUMBER
 myPage = test.browser.open(url).read()
