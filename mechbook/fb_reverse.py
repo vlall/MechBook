@@ -2,8 +2,8 @@
 
 import json
 import mechanize
-from militia.tools.facebook import Load_FB
-from militia.tools.genderize import Find_Gender
+from fb_utils import Load_FB
+#from militia.tools.genderize import Find_Gender
 from bs4 import BeautifulSoup
 import urllib2
 import time
@@ -49,7 +49,7 @@ class Identity:
 	def open_File(self, number):
 
 		self.number = number
-		url = 'https://www.facebook.com/search/str/%%20%s/keywords_top' % str(number)
+		url = 'https://www.facebook.com/search/str/%s/keywords_top' % str(number)
 		site = self.mechRead(url)
 		return site
 
@@ -189,11 +189,11 @@ class Identity:
 					f.write(y + ',')
 		        f.write('\n')
 
-	def genderCheck(self,name):
-
-		name = name.split()
-		x = Find_Gender(name[0])
-		return str(x.gender)
+	#def genderCheck(self,name):
+#
+	#	name = name.split()
+	#	x = Find_Gender(name[0])
+	#	return str(x.gender)
 	
 	def get_MetaTags(self, index, tag):
 		tag = '%s,%s' %(str(index), str(tag))
@@ -237,7 +237,7 @@ if __name__ == '__main__':
 			areaName = findUsers.get_areaCode(phone)
 			intel = findUsers.get_Intel(name, areaName)
 			location = findUsers.get_GPS(areaName, search._api)
-			gender = findUsers.genderCheck(name)
+			gender = 'findUsers.genderCheck(name)'
 			meta = findUsers.get_Meta(index)
 			#meta = findUsers.metaDict
 			appendOut = [index,phone,name, gender,url,city,job,areaName,intel,location,meta]

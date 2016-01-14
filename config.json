@@ -1,6 +1,6 @@
 {
 "email" : "facebook_EMAIL",
-"password" : "facebook_PASS",
+"pass" : "facebook_PASS",
 "input_file" : "input.csv",
 "output_file" : "output.csv",
 "gmaps-api-key": "XXXXXXXXXXXXXXXXXXXXXX"

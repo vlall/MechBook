@@ -37,5 +37,7 @@ class Load_FB:
 		
 if __name__ == '__main__': 
 	#Debugging
-	Load_FB()
-	print Load_FB().read_Response()
+	x = Load_FB()
+	test = Load_FB().read_Response()
+	url ='https://m.facebook.com/search/top/?q=%s' % 8102934256
+	print x.browser.open(url).read()
