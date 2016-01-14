@@ -3,12 +3,14 @@ import mechanize
 
 class Load_FB:
 
+
 	#Facebook Mechanize session
 	def __init__(self):
 		with open('../config.json', 'r') as file:
 			config = json.load(file)
 		_email = config['email']
 		_pass = config['pass']
+
 		# Set Location of data file
 		_input = '../' + config['input_file']
 		_output = config['output_file']
@@ -36,8 +38,6 @@ class Load_FB:
 		 return self.response.read()
 		
 if __name__ == '__main__': 
-	#Debugging
-	x = Load_FB()
-	test = Load_FB().read_Response()
+	test = Load_FB()
 	url ='https://m.facebook.com/search/top/?q=%s' % 8102934256
-	print x.browser.open(url).read()
+	print test.browser.open(url).read()

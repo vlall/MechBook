@@ -1,8 +1,8 @@
 # MechBook
 Mechbook allows you to Mechanize Facebook reverse searches- given a csv list containing phone numbers, reverse search facebook profile names and links of posters.
 #####TO DO
-- Clean up Testing Folder
-- Fix Dependencies for Fb_reverse.py
+- Make Testing Folder
+- Fix Dependencies
 
 ##Dependencies
 - Mechanize
@@ -13,7 +13,7 @@ Mechbook allows you to Mechanize Facebook reverse searches- given a csv list con
 
   ```
   "email" : "facebook_EMAIL",
-  "password" : "facebook_PASS",
+  "pass" : "facebook_PASS",
   ```
 2. Next, you can leave the default input.csv for testing, or put in your own phone numbers.  
   ```
@@ -30,10 +30,12 @@ Mechbook allows you to Mechanize Facebook reverse searches- given a csv list con
   ```
 import tika
 from tika import parser
-from fb_utils import Load_FB()
+from fb_utils import Load_FB
 
 # Mechanize into Your Facebook Profile
-myPage = Load_FB().read_Response()
+test = Load_FB()
+url ='https://m.facebook.com/search/top/?q=%s' % TESTING_NUMBER
+myPage = test.browser.open(url).read()
 print myPage
 
 # Save to out.txt
